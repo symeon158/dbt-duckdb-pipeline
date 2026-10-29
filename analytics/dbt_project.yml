@@ -1,0 +1,16 @@
+name: analytics
+
+profile: analytics
+
+seed-paths: ["seeds"]
+model-paths: ["models"]
+macro-paths: ["macros"]
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+
+
+# models:
+#   analytics:
+    
