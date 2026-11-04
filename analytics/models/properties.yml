@@ -72,3 +72,24 @@ models:
         description: Number of postings for that location.
         data_tests:
           - not_null
+
+  - name: monthly_summary
+    description: Total postings per month across all roles, with the number and share that are remote.
+    columns:
+      - name: month
+        description: First day of the month the postings were collected.
+        data_tests:
+          - not_null
+          - unique
+      - name: total_postings
+        description: Number of postings that month, summed over all roles in jobs_per_month.
+        data_tests:
+          - not_null
+      - name: remote_postings
+        description: Number of postings that month marked as remote (job_work_from_home is true).
+        data_tests:
+          - not_null
+      - name: pct_remote
+        description: Remote postings as a percentage of total postings, rounded to one decimal.
+        data_tests:
+          - not_null
