@@ -11,6 +11,9 @@ clean-targets:
 
 
 
-# models:
-#   analytics:
-    
+models:
+  analytics:
+    # Write model and column descriptions to the database as comments
+    +persist_docs:
+      relation: true
+      columns: true

@@ -1,0 +1,74 @@
+models:
+  - name: job_postings
+    description: >
+      Job postings loaded from the monthly raw parquet files, excluding rows
+      that failed to scrape. One row per posting per search, so the same job
+      can appear more than once.
+    columns:
+      - name: job_id
+        description: Identifier of the posting. Repeats when a job is found by more than one search.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+          - unique:
+              config:
+                severity: warn
+      - name: job_title
+        description: Title of the position as listed in the posting.
+        data_tests:
+          - not_null
+      - name: company_name
+        description: Name of the hiring company.
+        data_tests:
+          - not_null
+      - name: job_location
+        description: Location as listed in the posting, e.g. a city or "Anywhere".
+      - name: job_via
+        description: Job board or site the posting was found through.
+      - name: job_schedule_type
+        description: Employment type, such as Full-time, Part-time, Contractor or Internship.
+      - name: job_work_from_home
+        description: True when the posting is marked as remote; null otherwise.
+      - name: search_date
+        description: Date the posting was collected.
+        data_tests:
+          - not_null
+      - name: search_term
+        description: Search query that returned the posting.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Data Analyst', 'Data Engineer', 'Data Scientist']
+
+  - name: jobs_per_month
+    description: Number of postings per month for each role.
+    columns:
+      - name: month
+        description: First day of the month the postings were collected.
+        data_tests:
+          - not_null
+      - name: role
+        description: Role searched for, taken from search_term in job_postings.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Data Analyst', 'Data Engineer', 'Data Scientist']
+      - name: postings
+        description: Number of postings for that month and role.
+        data_tests:
+          - not_null
+
+  - name: top_locations
+    description: The 10 locations with the most postings.
+    columns:
+      - name: job_location
+        description: Location as listed in the posting.
+        data_tests:
+          - unique
+      - name: postings
+        description: Number of postings for that location.
+        data_tests:
+          - not_null

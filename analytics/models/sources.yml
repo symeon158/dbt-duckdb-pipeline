@@ -1,0 +1,73 @@
+sources:
+  - name: raw
+    description: Raw parquet files written by scripts/download_data.py into data/raw.
+    tables:
+      - name: job_postings
+        description: >
+          One row per posting returned by a search, across all monthly files.
+          Includes rows where the scrape failed (error is true), which have
+          most other columns empty.
+        config:
+          external_location: "../data/raw/raw_job_postings_*.parquet"
+        columns:
+          - name: job_id
+            description: Identifier of the posting. Empty on failed scrapes.
+          - name: job_title
+            description: Title of the position as listed in the posting.
+          - name: company_name
+            description: Name of the hiring company.
+          - name: job_location
+            description: Location as listed in the posting.
+          - name: job_via
+            description: Job board or site the posting was found through.
+          - name: job_posted_at
+            description: Relative posting age as text, e.g. "3 days ago".
+          - name: job_salary
+            description: Salary as listed in the posting, as free text.
+          - name: job_schedule_type
+            description: Employment type, such as Full-time or Contractor.
+          - name: job_work_from_home
+            description: True when the posting is marked as remote; null otherwise.
+          - name: job_extensions_raw
+            description: Extra posting attributes as returned by the source, unparsed.
+          - name: job_detected_extensions_raw
+            description: Attributes detected by the source (e.g. schedule, salary), unparsed.
+          - name: search_time
+            description: Timestamp the search ran.
+            data_tests:
+              - not_null
+          - name: search_date
+            description: Date the search ran.
+            data_tests:
+              - not_null
+          - name: search_term
+            description: Search query that returned the posting.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['Data Analyst', 'Data Engineer', 'Data Scientist']
+          - name: search_location
+            description: Location the search was run for.
+          - name: error
+            description: True when the scrape failed for this row; null otherwise.
+          - name: error_message
+            description: Error returned when the scrape failed.
+
+      - name: job_skills
+        description: Skills mentioned in each posting, one row per posting and skill.
+        config:
+          external_location: "../data/raw/raw_job_skills.parquet"
+        columns:
+          - name: job_id
+            description: Posting the skill was found in; matches job_postings.job_id.
+            data_tests:
+              - not_null
+          - name: skill_keyword
+            description: Skill as a normalized keyword, e.g. "python".
+            data_tests:
+              - not_null
+          - name: skill_id
+            description: Identifier of the skill.
+            data_tests:
+              - not_null
