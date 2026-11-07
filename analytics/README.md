@@ -1,12 +1,9 @@
-# 🥪 The Jaffle Shop 🦘
+# analytics
 
-_powered by the dbt Fusion engine_
+The dbt project for this pipeline. See the [main README](../README.md) for setup, how to run it, and the full data catalog of sources, models, columns and tests.
 
-Welcome! This is a sandbox project for exploring the basic functionality of Fusion. It's based on a fictional restaurant called the Jaffle Shop that serves [jaffles](https://en.wikipedia.org/wiki/Pie_iron).
+Run dbt commands from this folder, since the database and parquet paths in the profile and `sources.yml` are relative to it:
 
-To get started:
-1. Set up your database connection in `~/.dbt/profiles.yml`. If you got here by running `dbt init`, you should already be good to go.
-2. Run `dbt build`. That's it!
-
-> [!NOTE]
-> If you're brand-new to dbt, we recommend starting with the [dbt Learn](https://learn.getdbt.com/) platform. It's a free, interactive way to learn dbt, and it's a great way to get started if you're new to the tool.
+```bash
+uv run dbt build
+```
