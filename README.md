@@ -2,6 +2,8 @@
 
 An analytics pipeline that turns a year of scraped data-job postings (July 2025 to June 2026) into query-ready tables. Raw parquet files are modeled with [dbt](https://www.getdbt.com/) (Fusion engine) on [DuckDB](https://duckdb.org/), tested on every build, and published by GitHub Actions as a single DuckDB file anyone can query.
 
+📖 **[Browse the dbt docs](https://symeon158.github.io/dbt-duckdb-pipeline/)**: every model, column, test and the lineage graph, rebuilt on every run.
+
 It answers questions like:
 
 - How many Data Analyst, Data Engineer and Data Scientist postings appear each month?
@@ -19,7 +21,11 @@ flowchart LR
 
 1. **Extract.** [scripts/download_data.py](scripts/download_data.py) downloads 13 parquet files (about 85 MB) into `data/raw/`: 12 monthly files of job postings plus one file of skills mentioned in each posting.
 2. **Transform and test.** The dbt project in [analytics/](analytics/) reads the parquet files directly as sources, cleans them into a `job_postings` model, builds summary models on top, and runs data tests on sources and models.
-3. **Publish.** On every push to `master`, every Monday, and on demand, [the workflow](.github/workflows/dbt_build.yml) rebuilds everything from scratch and uploads `prod.duckdb` to the [`warehouse` release](https://github.com/symeon158/dbt-duckdb-pipeline/releases/tag/warehouse).
+3. **Publish.** On every push to `master`, every Monday, and on demand, [the workflow](.github/workflows/dbt_build.yml) rebuilds everything from scratch, uploads `prod.duckdb` to the [`warehouse` release](https://github.com/symeon158/dbt-duckdb-pipeline/releases/tag/warehouse), and deploys the [dbt docs site](https://symeon158.github.io/dbt-duckdb-pipeline/) to GitHub Pages.
+
+The lineage graph from the dbt docs, showing the source, the four models and the tests on `job_postings`:
+
+![dbt lineage graph: the raw job_postings source feeds the job_postings model, which feeds top_locations, jobs_per_month and monthly_summary, with seven data tests attached](docs/lineage.png)
 
 ## Query the published warehouse
 
@@ -92,6 +98,7 @@ duckdb -readonly -ui ../data/dev.duckdb
 │       ├── properties.yml            model descriptions, columns and tests
 │       └── *.sql                     one file per model
 ├── ci/profiles.yml                   dbt connection used by GitHub Actions
+├── docs/lineage.png                  lineage screenshot used in this README
 ├── scripts/
 │   ├── download_data.py              fetches the raw dataset into data/raw/
 │   └── generate_docs.py              writes the data catalog below into this README
