@@ -6,7 +6,10 @@ on:
     - cron: '17 6 * * 1'    # Mondays — the pipeline runs while you sleep
   workflow_dispatch:        # …and a manual Run button
 permissions:
-  contents: write           # lets the workflow update the release
+  contents: write           # lets the workflow update the release and commit the README
+concurrency:
+  group: dbt-build          # one run at a time, so README commits don't collide
+  cancel-in-progress: false
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,6 +20,18 @@ jobs:
       - run: uv run python scripts/download_data.py
       - run: uv run dbt build --profiles-dir ../ci
         working-directory: analytics
+      # Regenerate the README data catalog and commit it only if it changed.
+      # Pushes made with the workflow's token don't start another run.
+      - run: |
+          uv run python scripts/generate_docs.py
+          if git diff --quiet README.md; then
+            echo "Data catalog already up to date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Regenerate README data catalog [skip ci]" README.md
+            git push
+          fi
       - run: |
           gh release create warehouse --notes "Warehouse — auto-built by dbt" || true
           gh release upload warehouse data/prod.duckdb --clobber
